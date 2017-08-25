@@ -13,6 +13,7 @@ router.get('/current', getCurrent);
 router.put('/:_id', update);
 router.delete('/:_id', _delete);
 
+
 module.exports = router;
 
 function authenticate(req, res) {
@@ -42,16 +43,16 @@ function register(req, res) {
 }
 
 function getAll(req, res) {
-    if (credentialsService.isAdmin(credentialsService.getTokenFromReq(req)))
-        userService.getAll()
+    //if (credentialsService.isAdmin(credentialsService.getTokenFromReq(req)))
+        userService.getAll(req.query)
             .then(function (users) {
                 res.send(users);
             })
             .catch(function (err) {
                 res.status(400).send(errorService.errorForSending(err));
             });
-    else
-        res.status(403).send(errorService.userErrorForSending("Просмотр списка пользователей доступен только админу"));    
+    //else
+    //    res.status(403).send(errorService.userErrorForSending("Просмотр списка пользователей доступен только админу"));    
 }
 
 function getCurrent(req, res) {
