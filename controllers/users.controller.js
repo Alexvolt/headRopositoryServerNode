@@ -2,13 +2,14 @@
 var express = require('express');
 var router = express.Router();
 var userService = require('services/user.service');
-var credentialsService = require('services/credentials.service');
+//var credentialsService = require('services/credentials.service');
 var errorService = require('services/error.service');
 
 // routes
 router.post('/authenticate', authenticate);
 router.post('/register', register);
 router.get('/', getAll);
+router.get('/:_id', getById);
 router.get('/current', getCurrent);
 router.put('/:_id', update);
 router.delete('/:_id', _delete);
@@ -44,6 +45,7 @@ function register(req, res) {
 
 function getAll(req, res) {
     //if (credentialsService.isAdmin(credentialsService.getTokenFromReq(req)))
+    if(!req.user.admin)
         userService.getAll(req.query)
             .then(function (users) {
                 res.send(users);
@@ -51,8 +53,25 @@ function getAll(req, res) {
             .catch(function (err) {
                 res.status(400).send(errorService.errorForSending(err));
             });
-    //else
-    //    res.status(403).send(errorService.userErrorForSending("Просмотр списка пользователей доступен только админу"));    
+    else
+        res.status(403).send(errorService.userErrorForSending("Просмотр списка пользователей доступен только админу"));    
+}
+
+function getById(req, res) {
+    if(req.params._id == 'current')
+        return getCurrent(req, res);
+
+    userService.getById(req.params._id)
+        .then(function (user) {
+            if (user) {
+                res.send(user);
+            } else {
+                res.sendStatus(404);
+            }
+        })
+        .catch(function (err) {
+            res.status(400).send(errorService.errorForSending(err));
+        });
 }
 
 function getCurrent(req, res) {
