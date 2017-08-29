@@ -2,15 +2,15 @@
 var express = require('express');
 var router = express.Router();
 var userService = require('services/user.service');
-//var credentialsService = require('services/credentials.service');
+var credentialsService = require('services/credentials.service');
 var errorService = require('services/error.service');
 
 // routes
 router.post('/authenticate', authenticate);
 router.post('/register', register);
 router.get('/', getAll);
-router.get('/:_id', getById);
 router.get('/current', getCurrent);
+router.get('/:_id', getById);
 router.put('/:_id', update);
 router.delete('/:_id', _delete);
 
@@ -44,8 +44,7 @@ function register(req, res) {
 }
 
 function getAll(req, res) {
-    //if (credentialsService.isAdmin(credentialsService.getTokenFromReq(req)))
-    if(!req.user.admin)
+    if (credentialsService.isAdmin(req))
         userService.getAll(req.query)
             .then(function (users) {
                 res.send(users);
@@ -58,9 +57,6 @@ function getAll(req, res) {
 }
 
 function getById(req, res) {
-    if(req.params._id == 'current')
-        return getCurrent(req, res);
-
     userService.getById(req.params._id)
         .then(function (user) {
             if (user) {
@@ -89,21 +85,28 @@ function getCurrent(req, res) {
 }
 
 function update(req, res) {
-    userService.update(req.params._id, req.body)
-        .then(function () {
-            res.sendStatus(200);
-        })
-        .catch(function (err) {
-            res.status(400).send(errorService.errorForSending(err));
-        });
+    let isAdmin = credentialsService.isAdmin(req);
+    if(!isAdmin && req.body.id != req.user.sub)
+        res.status(403).send(errorService.userErrorForSending("Редактировать профили других пользователей может только админ"));    
+    else 
+        userService.update(req.params._id, req.body, isAdmin)
+            .then(function () {
+                res.sendStatus(200);
+            })
+            .catch(function (err) {
+                res.status(400).send(errorService.errorForSending(err));
+            });
 }
 
 function _delete(req, res) {
-    userService.delete(req.params._id)
-        .then(function () {
-            res.sendStatus(200);
-        })
-        .catch(function (err) {
-            res.status(400).send(errorService.errorForSending(err));
-        });
+    if (credentialsService.isAdmin(req))
+        userService.delete(req.params._id)
+            .then(function () {
+                res.sendStatus(200);
+            })
+            .catch(function (err) {
+                res.status(400).send(errorService.errorForSending(err));
+            });
+    else
+        res.status(403).send(errorService.userErrorForSending("Удаление пользователей доступно только админу"));    
 }

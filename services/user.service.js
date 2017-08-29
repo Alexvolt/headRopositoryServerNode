@@ -107,17 +107,21 @@ async function create(userParam) {
 
 }
 
-function update(id, userParam) {
-    return knex('users')
-    .where({id: id})
-    .update({
+function update(id, userParam, isAdmin) {
+    let updateParams = {
                 username:       userParam.username,
                 firstName:      userParam.firstName,
                 lastName:       userParam.lastName,
-                email:          userParam.email,
-                admin:          userParam.admin,
-                haveAccess:     userParam.haveAccess,
-    });
+                email:          userParam.email
+    }
+    if(isAdmin){
+        updateParams.admin = userParam.admin;    
+        updateParams.haveAccess = userParam.haveAccess;    
+    }
+
+    return knex('users')
+    .where({id: id})
+    .update(updateParams);
 }
 
 function _delete(id) {
