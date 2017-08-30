@@ -17,6 +17,7 @@ app.use(expressJwt({ secret: config.secret }).unless({ path: ['/users/authentica
 expressJwt.caller
 // routes
 app.use('/users', require('./controllers/users.controller'));
+app.use('/professionalAreas', require('./controllers/professionalAreas.controller'));
 
 
 // start server

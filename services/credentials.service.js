@@ -18,6 +18,16 @@ function isAdmin(req){
   return false;
 }
 
+/** check token: have a user admin rights
+* @param req - http request
+*/
+function canEditReferences(req){
+  if(req.user && req.user.admin)
+    return true;
+
+  return false;
+}
+
 /** extracting the token from a request
 * @param req - request to api
 */
