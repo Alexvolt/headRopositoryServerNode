@@ -24,13 +24,17 @@ function authenticate(username, password) {
             if(!user.haveAccess){
                 return Promise.reject(errorService.userErrorForSending('access denied: admin must give full access for app first'));
             }
+
+            let tokenData = { sub: user.id, admin: user.admin};
+
             return Promise.resolve({
                 id: user.id,
                 username:  user.username,
                 firstName: user.firstName,
                 lastName:  user.lastName,
                 email:     user.email,
-                token: jwt.sign({ sub: user.id, admin: user.admin}, config.secret, { expiresIn: '1h' })
+                tokenAuth: jwt.sign(tokenData, config.secretAuth, { expiresIn: config.expiresInAuth }),
+                tokenAccess: getAccessToken(user.id, user.admin)
             });
         } else {
             // authentication failed
@@ -40,6 +44,11 @@ function authenticate(username, password) {
     .catch((err) => {
         return Promise.reject(errorService.errorForSending(err));
     });
+}
+
+function getAccessToken(userID, isAdmin) {
+  // в будущем нужно добавить
+  return jwt.sign({ sub: userID, admin: isAdmin}, config.secretAccess, { expiresIn: config.expiresInAccess });
 }
 
 function getUser(username) {

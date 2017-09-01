@@ -1,12 +1,14 @@
 ﻿var config = require('config.json');
 var express = require('express');
-var router = express.Router();
+const jwt = require('jsonwebtoken');
 var userService = require('services/user.service');
 var credentialsService = require('services/credentials.service');
 var errorService = require('services/error.service');
 
 // routes
+var router = express.Router();
 router.post('/authenticate', authenticate);
+router.post('/accessToken', getAccessToken);
 router.post('/register', register);
 router.get('/', getAll);
 router.get('/current', getCurrent);
@@ -31,6 +33,32 @@ function authenticate(req, res) {
         .catch(function (err) {
             res.status(400).send(errorService.errorForSending(err));
         });
+}
+
+function getAccessToken(req, res) {
+    // get auth token data
+    let decoded = {}
+    try {
+        decoded = jwt.verify(req.body.tokenAuth, config.secretAuth);
+    } catch(err) {
+        res.status(403).send(errorService.userErrorForSending('You need to login again'));
+        return;
+    }
+
+    // get user data 
+    userService.getById(id)
+        .then((user) => {
+            if(user.haveAccess) {
+                // user haveAccess - send new access token
+                let tokenAccess = userService.getAccessToken(user.id, user.admin);
+                res.send({tokenAccess: tokenAccess});
+            } else
+                res.status(403).send(errorService.userErrorForSending('access denied by admin'));
+        })
+        .catch(function (err) {
+            res.status(400).send(errorService.errorForSending(err));
+        });
+    
 }
 
 function register(req, res) {
