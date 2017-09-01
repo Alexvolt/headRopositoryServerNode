@@ -5,6 +5,7 @@ var errorService = require('services/error.service');
 const service = {};
 
 service.getAll = getAll;
+service.getParents = getParents;
 service.getById = getById;
 service.create = create;
 service.update = update;
@@ -12,13 +13,12 @@ service.delete = _delete;
 
 module.exports = service;
 
-
-function getByName(name) {
-  return knex('professionalAreas').where({name}).first();
+function getAll(query) {
+    return  knex.select('id', 'name', 'parentId', 'created_at').from('professionalAreas').orderBy('parentId').orderBy('name');
 }
 
-function getAll(query) {
-    return  knex.select('id', 'name', 'parentId', 'created_at').from('professionalAreas').orderBy('parentId').orderBy('id');
+function getParents(query) {
+    return  knex.select('id', 'name', 'created_at').from('professionalAreas').whereNull('parentId').orderBy('name');
 }
 
 function getById(id) {

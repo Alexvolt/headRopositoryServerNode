@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const knex = require('./connection');
-const _ = require('lodash');
+//const _ = require('lodash');
 
 var errorService = require('services/error.service');
 

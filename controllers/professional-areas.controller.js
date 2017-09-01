@@ -1,11 +1,12 @@
 var config = require('config.json');
 var express = require('express');
 var router = express.Router();
-var userService = require('services/professionalAreas.service');
+var dataService = require('services/professional-areas.service');
 var credentialsService = require('services/credentials.service');
 var errorService = require('services/error.service');
 
 // routes
+router.get('/parents', getParents);
 router.get('/', getAll);
 router.get('/:_id', getById);
 router.post('/', create);
@@ -24,19 +25,25 @@ function credentialsCheckAndForbiddenErrorSending(req, res) {
 
 function create(req, res) {
   if (credentialsCheckAndForbiddenErrorSending(req, res))
-    userService.create(req.body, req.user.sub)
+    dataService.create(req.body, req.user.sub)
       .then(() => {res.sendStatus(200);})
       .catch((err) => {res.status(400).send(errorService.errorForSending(err));});
 }
 
 function getAll(req, res) {
-  userService.getAll(req.query)
+  dataService.getAll(req.query)
+    .then((users) => {res.send(users);})
+    .catch((err) => {res.status(400).send(errorService.errorForSending(err));});
+}
+
+function getParents(req, res) {
+  dataService.getParents(req.query)
     .then((users) => {res.send(users);})
     .catch((err) => {res.status(400).send(errorService.errorForSending(err));});
 }
 
 function getById(req, res) {
-  userService.getById(req.params._id)
+  dataService.getById(req.params._id)
     .then((user) => {
       if (user) {
         res.send(user);
@@ -49,14 +56,14 @@ function getById(req, res) {
 
 function update(req, res) {
   if (credentialsCheckAndForbiddenErrorSending(req, res))
-    userService.update(req.params._id, req.body)
+    dataService.update(req.params._id, req.body)
       .then(() => {res.sendStatus(200);})
       .catch((err) => {res.status(400).send(errorService.errorForSending(err));});
 }
 
 function _delete(req, res) {
   if (credentialsCheckAndForbiddenErrorSending(req, res))
-    userService.delete(req.params._id)
+    dataService.delete(req.params._id)
       .then(() => {res.sendStatus(200);})
       .catch((err) => {res.status(400).send(errorService.errorForSending(err));});
 }
