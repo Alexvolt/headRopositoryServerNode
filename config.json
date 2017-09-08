@@ -3,6 +3,6 @@
     "secretAuth": "ffc365d45d73abecc6cc5da937ee483124d46ff1d33732c856ed8e2f43398f94",
     "secretAccess": "fab5671e5e45d67cc75449da735137e4098b7e6b19b1334c3872ddf9b4a99d95",
     "expiresInAuth": "120h",
-    "expiresInAccess": "10s",
+    "expiresInAccess": "15s",
     "debugMode": true
 }
