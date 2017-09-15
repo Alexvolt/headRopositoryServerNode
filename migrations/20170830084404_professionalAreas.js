@@ -2,7 +2,7 @@ exports.up = (knex, Promise) => {
   return knex.schema.createTable('professionalAreas', (table) => {
     table.increments();
     table.string('name').unique().notNullable();
-    table.integer('parentId').notNullable();
+    table.integer('parentId').nullable();
     table.timestamp('created_at').notNullable().defaultTo(knex.raw('now()'));
     table.integer('created_by').notNullable();
   });

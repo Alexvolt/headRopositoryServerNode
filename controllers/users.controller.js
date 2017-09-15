@@ -44,7 +44,7 @@ function getAccessToken(req, res) {
     try {
         decoded = jwt.verify(req.body.tokenAuth, config.secretAuth);
     } catch (err) {
-        res.status(403).send(errorService.userErrorForSending('You need to login again'));
+        res.status(401).send(errorService.userErrorForSending('You need to login again'));
         return;
     }
 
@@ -131,7 +131,7 @@ function update(req, res) {
 
 function updatePasswordCurrentUser(req, res) {
     const userId = req.user.sub;
-    return userService.getById(userId)
+    return userService.getPasswordById(userId)
         .then((user) => {
             const oldPassword = req.body.oldPassword;
             if (oldPassword && bcrypt.compareSync(oldPassword, user.password))

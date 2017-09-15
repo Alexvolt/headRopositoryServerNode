@@ -11,6 +11,7 @@ const service = {};
 service.authenticate = authenticate;
 service.getAll = getAll;
 service.getById = getById;
+service.getPasswordById = getPasswordById;
 service.create = create;
 service.update = update;
 service.delete = _delete;
@@ -57,6 +58,10 @@ function getAccessToken(userID, isAdmin) {
 
 function getUser(username) {
     return knex('users').where({ username }).first();
+}
+
+function getPasswordById(id) {
+    return knex.select('password').from('users').where({ id }).first();
 }
 
 function getAll(query) {
